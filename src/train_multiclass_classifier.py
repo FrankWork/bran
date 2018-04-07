@@ -142,9 +142,10 @@ def train_model(model, pos_dist_supervision_batcher, neg_dist_supervision_batche
 def main(argv):
     ## TODO gross
     if ('transformer' in FLAGS.text_encoder or 'glu' in FLAGS.text_encoder) and FLAGS.token_dim == 0:
-        FLAGS.token_dim = FLAGS.embed_dim-(2*FLAGS.position_dim)
+        FLAGS.token_dim = FLAGS.--(2*`FLAGS`.position_dim)
     # print flags:values in alphabetical order
-    print ('\n'.join(sorted(["%s : %s" % (str(k), str(v)) for k, v in FLAGS.__dict__['__flags'].iteritems()])))
+    # print ('\n'.join(sorted(["%s : %s" % (str(k), str(v)) for k, v in FLAGS.__dict__['__flags'].items()])))
+    print(FLAGS.flags_into_string())
 
     if FLAGS.vocab_dir == '':
         print('Error: Must supply input data generated from tsv_to_tfrecords.py')
@@ -156,24 +157,24 @@ def main(argv):
     # read in str <-> int vocab maps
     with open(FLAGS.vocab_dir + '/rel.txt', 'r') as f:
         kb_str_id_map = {l.split('\t')[0]: int(l.split('\t')[1].strip()) for l in f.readlines()}
-        kb_id_str_map = {i: s for s, i in kb_str_id_map.iteritems()}
+        kb_id_str_map = {i: s for s, i in kb_str_id_map.items()}
         kb_vocab_size = FLAGS.kb_vocab_size
     with open(FLAGS.vocab_dir + '/token.txt', 'r') as f:
         token_str_id_map = {l.split('\t')[0]: int(l.split('\t')[1].strip()) for l in f.readlines()}
         if FLAGS.start_end:
             if '<START>' not in token_str_id_map: token_str_id_map['<START>'] = len(token_str_id_map)
             if '<END>' not in token_str_id_map: token_str_id_map['<END>'] = len(token_str_id_map)
-        token_id_str_map = {i: s for s, i in token_str_id_map.iteritems()}
+        token_id_str_map = {i: s for s, i in token_str_id_map.items()}
         token_vocab_size = len(token_id_str_map)
 
 
     with open(FLAGS.vocab_dir + '/entities.txt', 'r') as f:
         entity_str_id_map = {l.split('\t')[0]: int(l.split('\t')[1].strip()) for l in f.readlines()}
-        entity_id_str_map = {i: s for s, i in entity_str_id_map.iteritems()}
+        entity_id_str_map = {i: s for s, i in entity_str_id_map.items()}
         entity_vocab_size = len(entity_id_str_map)
     with open(FLAGS.vocab_dir + '/ep.txt', 'r') as f:
         ep_str_id_map = {l.split('\t')[0]: int(l.split('\t')[1].strip()) for l in f.readlines()}
-        ep_id_str_map = {i: s for s, i in ep_str_id_map.iteritems()}
+        ep_id_str_map = {i: s for s, i in ep_str_id_map.items()}
         ep_vocab_size = len(ep_id_str_map)
 
     if FLAGS.ner_train != '':
@@ -182,7 +183,7 @@ def main(argv):
             if FLAGS.start_end:
                 if '<START>' not in ner_label_str_id_map: ner_label_str_id_map['<START>'] = len(ner_label_str_id_map)
                 if '<END>' not in ner_label_str_id_map: ner_label_str_id_map['<END>'] = len(ner_label_str_id_map)
-            ner_label_id_str_map = {i: s for s, i in ner_label_str_id_map.iteritems()}
+            ner_label_id_str_map = {i: s for s, i in ner_label_str_id_map.items()}
             ner_label_vocab_size = len(ner_label_id_str_map)
     else:
         ner_label_id_str_map = {}
@@ -207,8 +208,8 @@ def main(argv):
         kg_in_file.close()
 
     e1_e2_ep_map = {} #{(entity_str_id_map[ep_str.split('::')[0]], entity_str_id_map[ep_str.split('::')[1]]): ep_id
-                      #for ep_id, ep_str in ep_id_str_map.iteritems()}
-    ep_e1_e2_map = {} #{ep: e1_e2 for e1_e2, ep in e1_e2_ep_map.iteritems()}
+                      #for ep_id, ep_str in ep_id_str_map.items()}
+    ep_e1_e2_map = {} #{ep: e1_e2 for e1_e2, ep in e1_e2_ep_map.items()}
 
     # get entity <-> type maps for sampling negatives
     entity_type_map, type_entity_map = {}, defaultdict(list)
@@ -216,14 +217,14 @@ def main(argv):
         with open(FLAGS.type_file, 'r') as f:
             entity_type_map = {entity_str_id_map[l.split('\t')[0]]: l.split('\t')[1].strip().split(',') for l in
                                f.readlines() if l.split('\t')[0] in entity_str_id_map}
-            for entity, type_list in entity_type_map.iteritems():
+            for entity, type_list in entity_type_map.items():
                 for t in type_list:
                     type_entity_map[t].append(entity)
             # filter
-            type_entity_map = {k: v for k, v in type_entity_map.iteritems() if len(v) > 1}
+            type_entity_map = {k: v for k, v in type_entity_map.items() if len(v) > 1}
             valid_types = set([t for t in type_entity_map.iterkeys()])
-            entity_type_map = {k: [t for t in v if t in valid_types] for k, v in entity_type_map.iteritems()}
-            entity_type_map = {k: v for k, v in entity_type_map.iteritems() if len(v) > 1}
+            entity_type_map = {k: [t for t in v if t in valid_types] for k, v in entity_type_map.items()}
+            entity_type_map = {k: v for k, v in entity_type_map.items() if len(v) > 1}
 
     string_int_maps = {'kb_str_id_map': kb_str_id_map, 'kb_id_str_map': kb_id_str_map,
                         'token_str_id_map': token_str_id_map, 'token_id_str_map': token_id_str_map,
