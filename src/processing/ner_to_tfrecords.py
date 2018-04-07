@@ -167,7 +167,7 @@ def tsv_to_examples():
 
     # remove tokens with < min_count
     print('Sorting and filtering vocab maps')
-    keep_tokens = sorted([(t, c) for t, c in token_counter.iteritems()
+    keep_tokens = sorted([(t, c) for t, c in token_counter.items()
                           if c >= FLAGS.min_count], key=lambda tup: tup[1], reverse=True)
     keep_tokens = [t[0] for t in keep_tokens]
 
@@ -204,7 +204,8 @@ def tsv_to_examples():
 
 
 def main(argv):
-    print('\n'.join(sorted(["%s : %s" % (str(k), str(v)) for k, v in FLAGS.__dict__['__flags'].iteritems()])))
+    # print('\n'.join(sorted(["%s : %s" % (str(k), str(v)) for k, v in FLAGS.__dict__['__flags'].iteritems()])))
+    print(FLAGS.flags_into_string())
     if FLAGS.out_dir == '':
         print('Must supply out_dir')
         sys.exit(1)

@@ -231,7 +231,7 @@ def make_example_all_mentions(entity_map, ep_map, rel_map, token_map, line, writ
                     'ep': int64_feature([ep]),
                     'rel': int64_feature([rel]),
                     'seq_len': int64_feature([len(tokens)]),
-                    'doc_id': bytes_feature([doc_id]),
+                    'doc_id': bytes_feature([bytes(doc_id, encoding='utf8')]),
                 }),
                 feature_lists=feature_lists({
                     "tokens": feature_list(tokens),
@@ -326,13 +326,13 @@ def tsv_to_examples():
 
         # remove tokens with < min_count
         print('Sorting and filtering vocab maps')
-        keep_tokens = sorted([(t, c) for t, c in token_counter.iteritems()
+        keep_tokens = sorted([(t, c) for t, c in token_counter.items()
                               if c >= FLAGS.min_count], key=lambda tup: tup[1], reverse=True)
         keep_tokens = [t[0] for t in keep_tokens]
         # int map all the kept vocab strings
         token_map = {t: i for i, t in enumerate(['<PAD>', '<UNK>'] + keep_tokens)}
-        entity_map = {e: i for i, e in enumerate(['<UNK>'] + entity_counter.keys())}
-        ep_map = {e: i for i, e in enumerate(['<UNK>'] + ep_counter.keys())}
+        entity_map = {e: i for i, e in enumerate(['<UNK>'] + list(entity_counter.keys()))}
+        ep_map = {e: i for i, e in enumerate(['<UNK>'] + list(ep_counter.keys()))}
 
         # export the string->int maps to file
         for f_str, id_map in [('entities', entity_map), ('ep', ep_map), ('rel', rel_map), ('token', token_map)]:
