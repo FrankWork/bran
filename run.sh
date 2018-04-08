@@ -1,7 +1,8 @@
-CDR_IE_ROOT=/home/frank/work/bran
+CDR_IE_ROOT=`pwd`
+PROTO_DIR=${CDR_IE_ROOT}/data/cdr/processed/just_train_2500/protos
 
 CUDA_VISIBLE_DEVICES=0 python ${CDR_IE_ROOT}/src/train_multiclass_classifier.py \
-  --vocab_dir=${CDR_IE_ROOT}/data/cdr/processed/just_train_2500/protos \
+  --vocab_dir=${PROTO_DIR} \
   --optimizer=adam \
   --loss_type= \
   --model_type=classifier \
@@ -18,7 +19,7 @@ CUDA_VISIBLE_DEVICES=0 python ${CDR_IE_ROOT}/src/train_multiclass_classifier.py 
   --lstm_dim=64 \
   --embed_dim=64 \
   --kb_epochs=100000 \
-  --text_epochs=100000 \
+  --text_epochs=1 \
   --eval_every=15000 \
   --max_seq=2000 \
   --neg_samples=200 \
@@ -32,8 +33,8 @@ CUDA_VISIBLE_DEVICES=0 python ${CDR_IE_ROOT}/src/train_multiclass_classifier.py 
   --embeddings ${CDR_IE_ROOT}/data/embeddings/just_train_2500_64d \
   --ner_prob 0.5 \
   --ner_weight 10.0 \
-  --ner_test ${CDR_IE_ROOT}/data/cdr/processed/just_train_2500/protos/ner_CDR_dev.txt.proto \
-  --ner_train ${CDR_IE_ROOT}/data/cdr/processed/just_train_2500/protos/ner_CDR_train.txt.proto \
+  --ner_test ${PROTO_DIR}/ner_CDR_dev.txt.proto \
+  --ner_train ${PROTO_DIR}/ner_CDR_train.txt.proto \
   --dropout_loss_weight 0 \
   --word_unk_dropout 0.85 \
   --beta1 .1 \
@@ -49,10 +50,10 @@ CUDA_VISIBLE_DEVICES=0 python ${CDR_IE_ROOT}/src/train_multiclass_classifier.py 
   --epsilon=1e-4 \
   --neg_noise=.20 \
   --pos_noise=.33 \
-  --negative_test_test=${CDR_IE_ROOT}/data/cdr/processed/just_train_2500/protos/negative_*test_filtered.txt.proto \
-  --positive_test_test=${CDR_IE_ROOT}/data/cdr/processed/just_train_2500/protos/positive_*test.txt.proto \
-  --negative_test=${CDR_IE_ROOT}/data/cdr/processed/just_train_2500/protos/negative_*train*_filtered.txt.proto \
-  --positive_test=${CDR_IE_ROOT}/data/cdr/processed/just_train_2500/protos/positive_*train*.txt.proto \
-  --negative_train=${CDR_IE_ROOT}/data/cdr/processed/just_train_2500/protos/negative_*train*_filtered.txt.proto \
-  --positive_train=${CDR_IE_ROOT}/data/cdr/processed/just_train_2500/protos/positive_*train*.txt.proto \
+  --negative_test_test=${PROTO_DIR}/negative_*test_filtered.txt.proto \
+  --positive_test_test=${PROTO_DIR}/positive_*test.txt.proto \
+  --negative_test=${PROTO_DIR}/negative_*train*_filtered.txt.proto \
+  --positive_test=${PROTO_DIR}/positive_*train*.txt.proto \
+  --negative_train=${PROTO_DIR}/negative_*train*_filtered.txt.proto \
+  --positive_train=${PROTO_DIR}/positive_*train*.txt.proto \
   --logdir=${CDR_IE_ROOT}/saved_models/cdr/relex/cdr_2500/2018-04-07-21//13424_21185

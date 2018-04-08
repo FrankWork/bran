@@ -161,7 +161,7 @@ class ClassifierModel(object):
         loss = 0.0
         labels = tf.one_hot(labels, self._num_labels, on_value=1.0-label_smoothing, off_value=label_smoothing)
         for logits in logits_list:
-            loss_batch = tf.nn.softmax_cross_entropy_with_logits(logits=logits, labels=labels)
+            loss_batch = tf.nn.softmax_cross_entropy_with_logits_v2(logits=logits, labels=labels)
             loss += tf.reduce_sum(self.example_loss_weights * loss_batch)
         # l2 loss on weights
         if l2_weight > 0.0:

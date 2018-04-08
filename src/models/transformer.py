@@ -303,7 +303,7 @@ class Transformer(TextEncoder):
                 total_input_size += shape[-1]
             input_shape = tf.shape(inputs[0])
             output_shape = []
-            for i in xrange(len(shapes[0])):
+            for i in range(len(shapes[0])):
                 output_shape.append(input_shape[i])
             output_shape[-1] = output_size
             for i, (input_, shape) in enumerate(zip(inputs, shapes)):
@@ -332,7 +332,7 @@ class Transformer(TextEncoder):
             # Do the multiplication
             new = tf.matmul(concatenation, matrix) + bias
             new = tf.reshape(new, output_shape)
-            new.set_shape([tf.Dimension(None) for _ in xrange(len(shapes[0])-1)] + [tf.Dimension(output_size)])
+            new.set_shape([tf.Dimension(None) for _ in range(len(shapes[0])-1)] + [tf.Dimension(output_size)])
             if n_splits > 1:
                 return tf.split(len(new.get_shape().as_list())-1, n_splits, new)
             else:
@@ -353,7 +353,7 @@ class Transformer(TextEncoder):
             inputs2_size = inputs2.get_shape().as_list()[-1]
             output_shape = []
             batch_size = 1
-            for i in xrange(ndims-2):
+            for i in range(ndims-2):
                 batch_size *= inputs1_shape[i]
                 output_shape.append(inputs1_shape[i])
             output_shape.append(inputs1_bucket_size)
@@ -416,7 +416,7 @@ class Transformer(TextEncoder):
 
             output_shape = []
             batch_size = 1
-            for i in xrange(ndims-2):
+            for i in range(ndims-2):
                 batch_size *= inputs1_shape[i]
                 output_shape.append(inputs1_shape[i])
             output_shape.append(inputs1_bucket_size)
@@ -465,7 +465,7 @@ class Transformer(TextEncoder):
             # result = self.diagonal_bilinear(e1, e2, num_labels)
             pairwise_scores = self.bilinear(e1, e2, self.num_labels)
             # self.attention_weights = tf.split(self.bilinear_scores, self.num_labels, 2)[1]
-            self.pairwise_scores = tf.nn.softmax(pairwise_scores, dim=2)
+            self.pairwise_scores = tf.nn.softmax(pairwise_scores, axis=2)
             result = tf.transpose(pairwise_scores, [0, 1, 3, 2])
             # mask result
             result += tf.expand_dims(self.ep_dist_batch, 3)

@@ -18,7 +18,7 @@ pos_ep_sum, pos_ep_count, neg_ep_sum, neg_ep_count = 0, 1, 0, 1
 
 
 def train_model(model, pos_dist_supervision_batcher, neg_dist_supervision_batcher,
-                positive_train_batcher, negative_train_batcher, ner_batcher, sv, sess, saver, train_op, ner_train_op,
+                positive_train_batcher, negative_train_batcher, ner_batcher, sess, saver, train_op, ner_train_op,
                 string_int_maps, positive_test_batcher, negative_test_batcher, ner_test_batcher,
                 positive_test_test_batcher, negative_test_test_batcher, tac_eval, fb15k_eval,
                 text_prob, text_weight,
@@ -42,7 +42,7 @@ def train_model(model, pos_dist_supervision_batcher, neg_dist_supervision_batche
     # sys.exit(1)
 
     print ('Starting training, eval every: %d' % eval_every)
-    while not sv.should_stop() and (max_steps <= 0 or step < max_steps) and (decrease_epochs <= max_decrease_epochs):
+    while not sess.should_stop() and (max_steps <= 0 or step < max_steps) and (decrease_epochs <= max_decrease_epochs):
         # try:
             if FLAGS.anneal_ner and step > 5000:
                 ner_prob = ner_prob * 1/(1 + ner_decay * step)
@@ -142,7 +142,7 @@ def train_model(model, pos_dist_supervision_batcher, neg_dist_supervision_batche
 def main(argv):
     ## TODO gross
     if ('transformer' in FLAGS.text_encoder or 'glu' in FLAGS.text_encoder) and FLAGS.token_dim == 0:
-        FLAGS.token_dim = FLAGS.--(2*`FLAGS`.position_dim)
+        FLAGS.token_dim = FLAGS.embed_dim-(2*FLAGS.position_dim)
     # print flags:values in alphabetical order
     # print ('\n'.join(sorted(["%s : %s" % (str(k), str(v)) for k, v in FLAGS.__dict__['__flags'].items()])))
     print(FLAGS.flags_into_string())
@@ -276,7 +276,7 @@ def main(argv):
         ner_test_batcher = NERInMemoryBatcher(FLAGS.ner_test, 1, FLAGS.max_seq, 10) if FLAGS.ner_test else None
         ner_batcher = NERBatcher(FLAGS.ner_train, FLAGS.text_epochs, FLAGS.max_seq, FLAGS.ner_batch) \
             if FLAGS.ner_train != '' else None
-
+        
         # initialize model
         if 'multi' in FLAGS.model_type and 'label' in FLAGS.model_type:
             model_type = MultiLabelClassifier
@@ -375,22 +375,31 @@ def main(argv):
             saver = tf.train.Saver(var_list=r_vars)
         else:
             saver = tf.train.Saver()
-        sv = tf.train.Supervisor(logdir=FLAGS.logdir if FLAGS.save_model != '' else None,
-                                 global_step=model.global_step,
-                                 saver=None,
-                                 save_summaries_secs=0,
-                                 save_model_secs=0, )
+        # sv = tf.train.Supervisor(logdir=FLAGS.logdir if FLAGS.save_model != '' else None,
+        #                          global_step=model.global_step,
+        #                          saver=None,
+        #                          save_summaries_secs=0,
+        #                          save_model_secs=0, )
 
-        with sv.managed_session(FLAGS.master,
-                                config=tf.ConfigProto(
-                                    # log_device_placement=True,
-                                    allow_soft_placement=True
-                                )) as sess:
+        with tf.train.MonitoredTrainingSession(FLAGS.master,
+                                            save_checkpoint_secs=None,
+                                            save_summaries_secs=None,
+                                            save_summaries_steps=None,
+                                            config=tf.ConfigProto(
+                                                # log_device_placement=True,
+                                                allow_soft_placement=True
+                                            )) as sess:
+
+        # with sv.managed_session(FLAGS.master,
+        #                         config=tf.ConfigProto(
+        #                             # log_device_placement=True,
+        #                             allow_soft_placement=True
+        #                         )) as sess:
             if FLAGS.load_model != '':
                 print("Deserializing model: %s" % FLAGS.load_model)
                 saver.restore(sess, FLAGS.load_model)
 
-            threads = tf.train.start_queue_runners(sess=sess)
+            # threads = tf.train.start_queue_runners(sess=sess)
             fb15k_eval = None
             tac_eval = None
 
@@ -405,7 +414,7 @@ def main(argv):
             if FLAGS.mode == 'train':
                 save_path = '%s/%s' % (FLAGS.logdir, FLAGS.save_model) if FLAGS.save_model != '' else None
                 train_model(model, pos_dist_supervision_batcher, neg_dist_supervision_batcher,
-                            positive_train_batcher, negative_train_batcher, ner_batcher, sv, sess, saver,
+                            positive_train_batcher, negative_train_batcher, ner_batcher, sess, saver,
                             train_op, ner_train_op, string_int_maps,
                             positive_test_batcher, negative_test_batcher, ner_test_batcher,
                             positive_test_test_batcher, negative_test_test_batcher,
@@ -441,9 +450,9 @@ def main(argv):
                 print('Error: "%s" is not a valid mode' % FLAGS.mode)
                 sys.exit(1)
 
-            sv.coord.request_stop()
-            sv.coord.join(threads)
-            sess.close()
+            # sv.coord.request_stop()
+            # sv.coord.join(threads)
+            # sess.close()
 
 
 if __name__ == '__main__':

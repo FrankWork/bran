@@ -161,7 +161,7 @@ def orthonormal_initializer(input_size, output_size):
     tries = 0
     while not success and tries < 10:
         Q = np.random.randn(input_size, output_size) / np.sqrt(output_size)
-        for i in xrange(100):
+        for i in range(100):
             QTQmI = Q.T.dot(Q) - I
             loss = np.sum(QTQmI**2 / 2)
             Q2 = Q**2
@@ -214,5 +214,5 @@ def load_pretrained_embeddings(str_id_map, embedding_file, dim, vocab_size):
     embedding_matrix = np.array([preloaded_embeddings[t] / normalizer if t in preloaded_embeddings
                                  else (np.sqrt(6.0 / (np.sum(dim))))
                                       * np.random.uniform(low=-alpha, high=alpha, size=dim)
-                                 for t in str_id_map.iterkeys()])
+                                 for t in str_id_map.keys()])
     return embedding_matrix

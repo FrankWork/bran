@@ -88,7 +88,6 @@ class InMemoryBatcher(Batcher):
             while max_batches <= 0 or batch_num < max_batches:
                 batch = sess.run(self.next_batch_op)
                 e1, e2, ep, rel, tokens, e1_dist, e2_dist, seq_len, doc_id = batch
-
                 batch = [(_e1, _e2, _ep, _rel, _tokens, _e1_dist, _e2_dist, _seq_len, _doc_id)
                          for (_e1, _e2, _ep, _rel, _tokens, _e1_dist, _e2_dist, _seq_len, _doc_id)
                          in zip(e1, e2, ep, rel, tokens, e1_dist, e2_dist, seq_len, doc_id)
@@ -114,7 +113,7 @@ class InMemoryBatcher(Batcher):
                     sys.stdout.flush()
         except Exception as e:
             print('')
-        for seq_len, batches in self.data.iteritems():
+        for seq_len, batches in self.data.items():
             self.data[seq_len] = [tuple((e1[i], e2[i], ep[i], rel[i], tokens[i], e1d[i], e2d[i], sl[i], did[i]))
                                   for (e1, e2, ep, rel, tokens, e1d, e2d, sl, did) in batches
                                   for i in range(e1.shape[0])]
@@ -144,23 +143,23 @@ class InMemoryBatcher(Batcher):
         _seq_len = np.array([s for e1, e2, ep, rel, t, e1d, e2d, s, did in batch])
         _doc_ids = np.array([did for e1, e2, ep, rel, t, e1d, e2d, s, did in batch])
         batch = (_e1, _e2, _ep, _rel, _tokens, _e1d, _e2d, _seq_len, _doc_ids)
-        if sum(self._bucket_probs.itervalues()) == 0:
+        if sum(self._bucket_probs.values()) == 0:
             self.reset_batch_pointer()
         return batch
 
     def reset_batch_pointer(self):
         # shuffle each bucket
-        for bucket in self.data.itervalues():
+        for bucket in self.data.values():
             shuffle(bucket)
         self.epoch += 1
         self.step = 0.
         # print('\nStarting epoch %d' % self.epoch)
-        self._starts = {i: 0 for i in self.data.iterkeys()}
-        self._ends = {i: min(self._batch_size, len(examples)) for i, examples in self.data.iteritems()}
-        self._bucket_probs = {i: len(l) for (i, l) in self.data.iteritems()}
+        self._starts = {i: 0 for i in self.data.keys()}
+        self._ends = {i: min(self._batch_size, len(examples)) for i, examples in self.data.items()}
+        self._bucket_probs = {i: len(l) for (i, l) in self.data.items()}
 
     def select_bucket(self):
-        buckets, weights = zip(*[(i, p) for i, p in self._bucket_probs.iteritems() if p > 0])
+        buckets, weights = zip(*[(i, p) for i, p in self._bucket_probs.items() if p > 0])
         total = float(sum(weights))
         probs = [w / total for w in weights]
         bucket = np.random.choice(buckets, p=probs)
@@ -214,7 +213,7 @@ class NERInMemoryBatcher(InMemoryBatcher):
                 sys.stdout.flush()
         except Exception as e:
             print('')
-        for seq_len, batches in self.data.iteritems():
+        for seq_len, batches in self.data.items():
             self.data[seq_len] = [tuple((t[i], n[i], e[i], s[i]))
                                   for (t, n, e, s) in batches
                                   for i in range(s.shape[0])]
@@ -238,7 +237,7 @@ class NERInMemoryBatcher(InMemoryBatcher):
         _entities = np.array([n for t, n, e, s in batch])
         _seq_len = np.array([s for t, n, e, s in batch])
         batch = (_tokens, _labels, _entities, _seq_len)
-        if sum(self._bucket_probs.itervalues()) == 0:
+        if sum(self._bucket_probs.values()) == 0:
             self.reset_batch_pointer()
         return batch
 
