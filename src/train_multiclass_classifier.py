@@ -110,7 +110,7 @@ def train_model(model, pos_dist_supervision_batcher, neg_dist_supervision_batche
 
                 feed_dict[model.noise_weight] = FLAGS.variance_min
 
-                _, global_step, loss, = sess.run([train_op, model.global_step, model.loss], feed_dict=feed_dict)
+                _, pl, global_step, loss, = sess.run([train_op, model.global_step, model.loss], feed_dict=feed_dict)
                 examples += batch_size
                 loss /= batch_size
 
@@ -277,6 +277,17 @@ def main(argv):
         ner_batcher = NERBatcher(FLAGS.ner_train, FLAGS.text_epochs, FLAGS.max_seq, FLAGS.ner_batch) \
             if FLAGS.ner_train != '' else None
         
+        # with tf.train.MonitoredTrainingSession(FLAGS.master,
+        #                                     save_checkpoint_secs=None,
+        #                                     save_summaries_secs=None,
+        #                                     save_summaries_steps=None,
+        #                                     ) as sess:
+        #     positive_test_batcher.load_all_data(sess)
+        #     batch = positive_test_batcher.next_batch(sess)
+        #     e1, e2, ep, rel, tokens, e1_dist, e2_dist, seq_len, doc_ids = batch
+        #     print(e1)
+        # exit()
+
         # initialize model
         if 'multi' in FLAGS.model_type and 'label' in FLAGS.model_type:
             model_type = MultiLabelClassifier

@@ -55,3 +55,9 @@ You can also generate the data using the genia tokenizer with
 
 By default, abstracts with > 500 tokens are discarded. To not filter you can change the MAX_LEN variable to a very large number. 
 
+# unused variables
+
+in `classifier_models.py`:
+- `self.attention_vector` 
+- `self.e1_dist_batch`
+- `self.e2_dist_batch`

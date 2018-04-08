@@ -340,7 +340,11 @@ class Transformer(TextEncoder):
 
     def bilinear(self, inputs1, inputs2, output_size, add_bias2=True, add_bias1=True, add_bias=False,
                  initializer=None, scope=None, moving_params=None):
-        """"""
+        """
+        Args:
+            inputs1: A 3d tensor with shape of [N, T, C].
+            inputs2: A 3d tensor with shape of [N, T, C].
+        """
         with tf.variable_scope(scope or 'Bilinear'):
             # Reformat the inputs
             ndims = len(inputs1.get_shape().as_list())
@@ -452,8 +456,8 @@ class Transformer(TextEncoder):
         with tf.variable_scope(scope_name, reuse=reuse):
             input_feats = encoded_tokens
 
-            e1_mask = tf.cast(tf.expand_dims(tf.equal(self.e1_dist_batch, self.entity_index), 2), tf.float32)
-            e2_mask = tf.cast(tf.expand_dims(tf.equal(self.e2_dist_batch, self.entity_index), 2), tf.float32)
+            e1_mask = None #tf.cast(tf.expand_dims(tf.equal(self.e1_dist_batch, self.entity_index), 2), tf.float32)
+            e2_mask = None #tf.cast(tf.expand_dims(tf.equal(self.e2_dist_batch, self.entity_index), 2), tf.float32)
 
             # # b x s x (d*l)
             e1 = tf.layers.dense(tf.layers.dense(input_feats, self.embed_dim, activation=tf.nn.relu), self.embed_dim)

@@ -116,7 +116,7 @@ class ClassifierModel(object):
 
             # encode the batch of sentences into b x d matrix
             token_attention = None # tf.squeeze(self.get_ep_embedding(), [1])
-            self.attention_vector = tf.nn.embedding_lookup(tf.transpose(self.w_1), tf.ones_like(self.e1_batch))
+            self.attention_vector = None #tf.nn.embedding_lookup(tf.transpose(self.w_1), tf.ones_like(self.e1_batch))
             encoded_text_list = self.text_encoder.embed_text(self.token_embeddings, self.position_embeddings,
                                                              self.attention_vector, token_attention=token_attention)
             no_drop_output_list = []
@@ -128,8 +128,10 @@ class ClassifierModel(object):
             else:
                 predictions_list = [self.score_sentence(et, reuse=(False if block_num == 0 else True))
                                     for block_num, et in enumerate(encoded_text_list)]
+            # len(predictions_list)==1
             predictions_list = [self.add_bias(pred) for pred in predictions_list]
-            self.predictions = predictions_list[-1]
+
+            self.predictions = predictions_list[-1] 
             self.probs = self.get_probs()
 
             self.loss = self.calculate_loss(encoded_text_list, predictions_list, self.label_batch,
